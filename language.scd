@@ -10,6 +10,9 @@
 "Finished";
 )
 
+// These blocks can be nested. Typically the entire patch will be enclosed in
+// a block, within which are several subblocks.
+
 // VARIABLES
 //
 // Variables are not typed.
@@ -17,8 +20,8 @@ a = "A string";
 a = 256;
 a = [0, 1, 2, 3, 4];
 
-// Variables are, generally speaking, block scoped, but there are three kinds
-// of variables, and these kinds affect the scoping rules.
+// There are three kinds of variables, and these kinds affect how the variables
+// are scoped.
 
 // Interpreter variables are represented by lowercase letters `a` through `z`.
 // These are predeclared by the interpreter, and are alwyas global. Remember
@@ -50,6 +53,8 @@ currentEnvironment.put(\myvar, 0.9);
 currentEnvironment.at(\myvar);
 
 // Local variables are declared using the `var` keyword, and have block scoping.
+// They must be declared at the top of the block, and may optionally be assigned
+// a value at declaration.
 (
 var localvar = 4;
 localvar.postln;
