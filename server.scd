@@ -26,10 +26,12 @@ Server.default.options.numInputBusChannels = 0;
 
 s.record;
 
+(
 {Saw.ar(
   LFNoise0.kr([2, 3]).range(100, 2000),
   LFPulse.kr([4, 5]) * 0.1)
 }.play;
+)
 
 s.stopRecording;
 
