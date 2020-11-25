@@ -1,24 +1,36 @@
 // NOTE: I'm interacting with SuperCollider via the NeoVim plugin SCNvim on a
-// Mac.  I start the server by first opening a SuperCollider document
-// (extension `.sc` or `.scd`) in NeoVim, then typing `:SCNvimStart`, and
-// finally evaluating a line like this:
+// Mac. So before I do anything else, I open a SuperCollider document
+// (extension `.sc` or `.scd`) in NeoVim, then type `:SCNvimStart` to start
+// the language interpreter.
 
-s.boot;
+// Once that's done, I can run a sequence like this to boot the audio server:
 
-// My computer has multiple inputs and outputs, and especially when I'm using a
-// headset with a built-in microphone, sometimes I run into a problem where the
-// default input device and the default output device are using different
-// sampling rates, which causes the SuperCollider server to fail to boot with a
-// `Mismatched sample rates are not supported` error. Since I don't have any
-// particular need for microphone input, I fix this by changing the number of
-// input devices to 0:
+(
+
+// Disable audio input. I don't generally use the microphone for anything in
+// SuperCollider, and on my setup the default microphone input is often set to
+// a different sample rate than the default output, which isn't allowed in
+// SuperCollider (you get a `Mismatched sample rates are not supported` error).
+// Disabling the microphone input fixes this.
 
 Server.default.options.numInputBusChannels = 0;
 
-// This line needs to be evaluated before booting the server.
-
-// Other ways of fixing this problem are described here:
+// Other ways of fixing this error are described here:
 // https://doc.sccode.org/Reference/AudioDeviceSelection.html
+
+// Boot the server.
+
+s.boot;
+
+// Open some useful widgets. Each of these will appear in a separate floating
+// window.
+
+s.makeWindow;   // Server window
+s.meter;        // Level meters
+s.scope;        // Waveform scope
+FreqScope.new;  // Frequency analysis
+s.plotTree;     // Object node tree
+)
 
 // The `s` variable, by default, refers to the local server---that is, it's an
 // alias for `Server.local`. We can tell the server to record the current
@@ -38,11 +50,10 @@ s.stopRecording;
 // The post window will display the path of the folder where the file is saved.
 // On my Mac, it's in ~/Music/SuperCollider Recordings/
 
-// Another way to start and stop recording is from a server window, which you
-// request like this:
+// We can also quit the audio server:
 
-s.makeWindow;
+s.quit;
 
-// Another useful window is the `plotTree`:
+// Note that this closes some of the widgets we opened earlier, but not all.
 
-s.plotTree;
+

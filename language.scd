@@ -100,6 +100,12 @@ localvar.postln;
 
 localvar.postln; // ERROR: Variable 'localvar' not defined.
 
+// Local variables only have scope within the code evaluation of which they are
+// part. This means that if you declare a local variable at the top level,
+// outside of any code blocks, and evaluate line-by-line, they'll go out of
+// scope between evaluations and the code won't work. Generally, only declare
+// local variables within blocks, like parentheses and functions.
+
 // Note that unlike local variables, interpreter variables and environment
 // variables don't require the`var` keyword at declaration.
 
@@ -257,3 +263,75 @@ true and: true
 
 // That said, when reading other people's code it's important to be able to
 // recognize all four message passing techniques.
+
+
+/******************************************************************************\
+|                           MULTICHANNEL EXPANSION                             |
+\******************************************************************************/
+
+// The server interprets an array of UGens as a multichannel signal. To produce
+// a stereo signal, just play an array of two UGens.
+
+~sine = { [ SinOsc.ar, SinOsc.ar ] }.play;
+
+// If you're just trying to send the same monophonic signal to both channels,
+// you can use the `dup` method to automatically create an array. This method
+// takes one argument, the number of times to duplicate the receiver.
+
+~sine = { SinOsc.ar.dup(2) }.play;
+
+
+// A shortcut for this method is an exclamation point, followed by the number of
+// times to duplicate.
+
+~sine = { SinOsc.ar!2 }.play;
+
+// You can also just pass an array of frequencies to a single SinOsc, which
+// also gets expanded into multiple channels.
+
+~ sine = { SinOsc.ar([300, 400]) }.play;
+
+
+/******************************************************************************\
+|                            MIXING AUDIO SOURCES                              |
+\******************************************************************************/
+
+// The simplest way to mix multiple UGens is to add them together.
+
+(
+~sum = {
+  var sig1, sig2, sig3;
+  sig1 = SinOsc.ar(400, mul: 0.2);
+  sig2 = SinOsc.ar(250, mul: 0.3);
+  sig3 = SinOsc.ar(1400, mul: 0.07);
+  sig1 + sig2 + sig3;
+}.play;
+)
+
+
+/******************************************************************************\
+|                                 MODULATION                                   |
+\******************************************************************************/
+
+// We can use UGens as inputs to other UGens, to modulate them in various ways.
+// In this example, we use one SinOsc as an LFO to create vibrato in another.
+// We want the resulting tone to vary between 280 and 320 Hz. We'll create a
+// vibrato oscillator with a frequency of 6 Hz (so that the vibrato completes
+// its cycle six times per second). Since the output of an oscillator normally
+// varies between -1 and 1, we'll multiply by 20 and add 300 to get a final
+// result varying between 280 and 320 six times per second.
+
+(
+~vib = {
+  var sig, vib;
+
+  vib = SinOsc.ar(6, 0, 20, 300);
+  sig = SinOsc.ar(vib, mul: 0.2)!2;
+}.play;
+)
+
+// A shortcut for the vibrato oscillator syntax is to use the `range` method.
+
+  vib = SinOsc.ar(6).range(280, 320);
+
+
