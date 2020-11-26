@@ -111,6 +111,215 @@ localvar.postln; // ERROR: Variable 'localvar' not defined.
 
 
 /******************************************************************************\
+|                            BASIC ARRAY OPERATIONS                            |
+\******************************************************************************/
+
+// As in JavaScript, elements in an array don't need to be of the same type.
+
+x = [ "String", $c, \symbol, 3.14 ];
+x.size;         // 4
+
+// You can index into an array using the `at` method.
+
+x.at(0);        // "String"
+x.at(4);        // nil
+
+// The more familiar indexing syntax also works.
+
+x[2];           // \symbol
+
+// Change the value at an index (modifying the receiver in place) using the
+// `put` method.
+
+x.put(2, 500);
+x.postln;       // [ "String", $c, 500, 3.14 ]
+
+// However, arrays have a fixed size. Adding an element to an array is
+// guaranteed to return a new array with the new element, but may or may not
+// change the original in place. This is because by default, array sizes are
+// always powers of two (unless you create an array using a class method and
+// specify a different size---see below). In the following example, since the
+// original array is of size 4, it's already full. Adding an element will not
+// modify the existing array.
+
+y = x.add(60);
+x.postln;       // [ "String", $c, 500, 3.14 ]
+y.postln;       // [ "String", $c, 500, 3.14, 60 ]
+
+// But in the next example, since the size of the original array is 3, it still
+// has room for one more element. Therefore, the original array is modified in
+// place (and the add operation also returns a new array).
+
+p = [ 1, 2, 3 ];
+q = p.add(4);
+p.postln;       // [ 1, 2, 3, 4 ]
+q.postln;       // [ 1, 2, 3, 4 ]
+
+// The safest thing to do is to assign the result of an add to the original
+// variable.
+
+p = p.add(5);
+p.postln;       // [ 1, 2, 3, 4, 5 ]
+
+// The same applies to the `insert` method.
+
+p = p.insert(0, 0);
+p.postln;       // [ 0, 1, 2, 3, 4, 5 ]
+
+// You can shuffle an array using the `scramble` method. This method does not
+// change the original in place. So again, if you want to save the shuffled
+// version to use later, store it in a variable (or manually overwrite the
+// original array).
+
+p.scramble;     // [ 4, 3, 1, 5, 0, 2 ]
+p.postln;       // [ 0, 1, 2, 3, 4, 5 ]
+
+// The same goes for the `reverse` method.
+
+p.reverse;      // [ 5, 4, 3, 2, 1, 0 ]
+p.postln;       // [ 0, 1, 2, 3, 4, 5 ]
+
+// It's also true of the `mirror` method, which pivots on the last item in the
+// array. Obviously, since the array returned by this method is of a different
+// size than the original, it may not fit into the original's maximum size.
+
+p.mirror;       // [ 0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 0 ]
+
+// The `mirror2` method is similar to `mirror` except that it doubles the last
+// element---that is, rather than pivoting on the last element, it returns the
+// whole array twice, first in the original order and then in reverse.
+
+p.mirror2;      // [ 0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0 ]
+
+// The `sort` method does change the original in place. Of course, it still
+// doesn't hurt to assign it back to the original variable, just for the sake
+// of consistency.
+
+r = [ 4, 2, 0, 1, 3 ]
+r.sort;         // [ 0, 1, 2, 3, 4 ]
+r.postln;       // [ 0, 1, 2, 3, 4 ]
+
+// The `rotate` method shifts all elements to the right, rotating back around
+// to the beginning when they go past the end. This does not modify the
+// original array in place.
+
+r.rotate;       // [ 4, 0, 1, 2, 3 ]
+r.postln;       // [ 0, 1, 2, 3, 4 ]
+
+// You can also specify a number of places to rotate. Negative numbers rotate
+// elements to the left.
+
+r.rotate(-2);   // [ 2, 3, 4, 0, 1 ]
+
+// Finally, the `choose` method returns a single element from the array, at
+// random, without modifying the array.
+
+r.choose;       // 4
+r.choose;       // 0
+r.choose;       // 4
+
+// This is just a sampling of methods available on arrays---there are many
+// others available.
+
+
+/******************************************************************************\
+|                                 ARRAY MATH                                   |
+\******************************************************************************/
+
+// Mathematical operations on arrays are "lifted"---that is, applied to each
+// element in the array. This does not modify the original array in place.
+
+x = [ 0, 1, 2, 3, 4 ];
+x * 2;          // [ 0, 2, 4, 6, 8 ]
+x.postln;       // [ 0, 1, 2, 3, 4 ]
+
+// (Some? Most?) mathematical methods work as well.
+
+x.squared;      // [ 0, 1, 4, 9, 16 ]
+x.odd;          // [ false, true, false, true, false ]
+
+// But not all mathematical methods are defined for arrays. For example, the
+// `isPrime` method, which works on integers, does not work on an array of
+// integers.
+
+3.isPrime;      // true
+x.isPrime;      // Error
+
+// Obviously these methods only make sense when they can be applied to all
+// elements in the array---which, since arrays can contained mixed types, isn't
+// necessarily the case. If, for example, you use the `squared` method on an
+// array with a string in it, you'll get an error.
+
+
+/******************************************************************************\
+                             ITERATION OVER ARRAYS                             |
+\******************************************************************************/
+
+// The `collect` method works like `map` in JavaScript: it iterates over the
+// array, calling a function (with, in most cases, an argument that takes the
+// value at the current position in the array and an optional second argument
+// for the current index number), and returning a new array with the contents
+// of the values returned by the function.
+
+x = [ "Bob", "Jane" ];
+y = x.collect({ arg name; "Hello" + name + "!"; });
+y.postln;       // [ "Hello Bob !", "Hello Jane !" ]
+
+// The `do` method is similar, but instead of returning a new array, it returns
+// its receiver, unmodified. The following example prints the greetings to the
+// screen, but doesn't return them in a new array.
+
+x = [ "Bob", "Jane" ];
+x.do({ arg name; var greet = "Hello"+name+"!"; greet.postln; });
+
+// The `select` and `reject` methods are similar to `filter` in other
+// languages. The `any` method returns true if at least one of its function
+// calls return true.
+
+x = [ 1, 2, 3, 4, 5 ];
+x.select({ arg num; num.isPrime; });  // [ 2, 3, 5 ]
+x.reject({ arg num; num.isPrime; });  // [ 1, 4 ]
+x.any({ arg num; num.isPrime; });     // true
+
+
+/******************************************************************************\
+|                             ARRAY CLASS METHODS                              |
+\******************************************************************************/
+
+// All of the array methods presented so far are instance methods. The
+// following class methods are useful when creating new arrays.
+
+// The `new` method creates an array with the specified size. As stated before,
+// array sizes always correspond to a power of 2. This means that although you
+// can specify any size, the array size will always round up to the next power
+// of 2.
+
+x = [ 1, 2, 3 ];
+x.add(4);           // [ 1, 2, 3, 4 ]
+x.postln;           // [ 1, 2, 3, 4 ]
+y = Array.new(3);
+y.add(1);
+y.add(2);
+y.add(3);
+y.add(4);           // Array is now full
+y.add(5);           // [ 1, 2, 3, 4, 5 ]
+y.postln;           // [ 1, 2, 3, 4 ]
+
+// There are several methods available to fill arrays with values
+// automatically.
+
+w = Array.series(4, 5, 5);                // [ 5, 10, 15, 20 ]
+x = Array.geom(8, 2, 2);                  // [ 2, 4, 8, 16, 32, 64, 128, 256 ]
+y = Array.interpolation(3, 100, 150);     // [ 100.0, 125.0, 150.0 ]
+z = Array.fill(3, { "hello".scramble; }); // [ "leolh", "helol", "ohlel" ]
+
+// There's also a shortcut for `Array.series`.
+
+(1..100);       // Generates an array with 100 elements, from 1 to 100
+(1,4..100);     // Same idea, but incrementing by 3
+(0,3..100);     // Same again, but stops at 99 because it can't hit 100 exactly
+
+/******************************************************************************\
 |                                  FUNCTIONS                                   |
 \******************************************************************************/
 
@@ -211,6 +420,40 @@ f.value(3, 5);
 // calculations are performed left to right. To ensure correct order of
 // operations, always use parentheses or perform calculations on multiple lines
 // of code.
+
+
+/******************************************************************************\
+|                                 RANDOMNESS                                   |
+\******************************************************************************/
+
+// The `rand` method returns a random value between 0 and its receiver. It
+// works on both integers and floats. The range of included numbers includes 0,
+// but not the receiver.
+
+10.rand;    // Returns a number from 0 to 9, but never 10.
+10.0.rand;
+
+// The `rrand` method allows you to specify a range, and this range is
+// inclusive.
+
+rrand(1, 10);   // Returns a number from 1 to 10, inclusive.
+
+// The `exprand` method returns a random number within a range, but uses an
+// exponential distribution---that is, lower numbers are more likely to be
+// chosen. Unlike `rand` and `exprand`, it returns floats even if its inputs
+// are ints. Also unlike those methods, both of its inputs must have the same
+// sign---its range cannot cross zero.
+
+exprand(1, 100);
+
+// This is also available as an Array class method:
+
+Array.exprand(8, 1, 100);
+
+// The Array class also has a `rand` method, which corresponds to `rrand`, not
+// `rand`.
+
+Array.rand(8, 1, 100);
 
 
 /******************************************************************************\
