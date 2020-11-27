@@ -66,4 +66,17 @@
 // Stereo panners/balancers
 //
 // Pan2
+
+(
+{
+  var sig;
+  sig = SinOsc.ar(440);
+
+  // Pan2 takes three arguments: an input signal, a position (-1 for hard left,
+  // 0 for center, 1 for hard right), and a level (same as the `mul` argument
+  // for other oscillators).
+  sig = Pan2.ar(in: sig, pos: 0.4, level: 0.2);
+}.play;
+)
+
 // Balance2

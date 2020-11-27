@@ -45,4 +45,27 @@
 
 // EnvGen
 //
-// 
+// EnvGen is the most flexible and complex envelope UGen. Its most important
+// parameters are Env, which consists of arrays of levels, times, and curves; and
+// doneAction, which is described above.
+
+(
+var envShape = Env.new(
+  [ 0, 1, 0.8, 0.8, 0 ],
+  [ 0.1, 2.5, 2, 3 ],
+  [ 2, -8, 0, -4 ],
+);
+
+f = {
+  arg freq=440, boost=4, pan=0, amp=0.2;
+  var sig, env;
+  env = EnvGen.ar(envShape, doneAction: 2);
+  sig = SinOsc.ar(freq);
+  sig = sig * boost;
+  sig = sig.softclip;
+  sig = Pan2.ar(sig, pan, amp);
+  sig = sig * env;
+};
+)
+
+x = f.play(args: [\freq, rrand(50, 500)]);
