@@ -22,6 +22,14 @@
 // is freed before the amplitude envlope reaches 0, causing an abrupt cutoff.
 
 
+/******************************************************************************\
+|                              SIMPLE ENVELOPES                                |
+\******************************************************************************/
+
+// These envelopes are simple in that they take just a few parameters. They're
+// easy to use, but less flexible than `EnvGen`. Some, like `Env.perc`, are
+// intended for a single, specific purpose.
+
 // Line
 //
 // Line takes a start value, an end value, and a duration (in seconds), and
@@ -42,12 +50,19 @@
 // XLine often sounds more natural than Line, because we perceive audio
 // features like amplitude and frequency exponentially.
 
-
-// EnvGen
+// Perc
 //
-// EnvGen is the most flexible and complex envelope UGen. Its most important
-// parameters are Env, which consists of arrays of levels, times, and curves; and
-// doneAction, which is described above.
+// Mostly intended for creating percussive sounds. Takes an `attackTime` and a
+// `releaseTime`, and optionally `level` and `curve`.
+
+
+/******************************************************************************\
+|                                    ENVGEN                                    |
+\******************************************************************************/
+
+// EnvGen is the most flexible way to create an envelope. Its most important
+// parameters are Env, which consists of arrays of levels, times, and curves;
+// and doneAction, which is described above.
 
 (
 var envShape = Env.new(
@@ -69,3 +84,102 @@ f = {
 )
 
 x = f.play(args: [\freq, rrand(50, 500)]);
+
+
+// Indefinite Length Envelopes
+//
+//
+
+(
+x = {
+  var sig, env;
+  env = EnvGen.kr(
+    Env.new(
+      [ 0, 1, 0 ],
+      [ 1, 3 ],
+      [ 0, 0 ]
+    ),
+    doneAction: 2
+  );
+  sig = SinOsc.ar(200);
+  sig = sig * 0.2;
+  sig = sig * env;
+  sig = sig!2;
+}.play;
+)
+
+
+/******************************************************************************\
+|                               GATED ENVELOPES                                |
+\******************************************************************************/
+
+// Some envelopes have indefinite length. The most common example is the ADSR
+// envelope found on most physical synths, which sustains until the key is
+// released. In these envelopes, a gate can be used to cause the envelope to
+// move into the "release" phase.
+//
+// The ADSR envelope takes `attackTime`, `decayTime`, `sustainLevel`, and
+// `releaseTime` arguments, and optionally `peakLevel`, `curve`, and `bias`.
+
+(
+f = {
+  arg gate=1;
+  var sig, env;
+  env = EnvGen.kr(
+    Env.adsr(0.01, 0.3, 0.5, 1),
+    gate,
+    doneAction:2
+  );
+  sig = SinOsc.ar(200);
+  sig = sig * 0.2;
+  sig = sig * env;
+  sig = sig!2;
+}
+)
+
+// Initially setting the gate to 0 creates the synth but doesn't start the
+// envelope.
+
+x = f.play(args: [\gate, 0]);
+
+// When the gate is positive, the envelope begins.
+
+x.set(\gate, 1);
+
+// Setting the gate back to 0 begins the release phase of the envelope.
+
+x.set(\gate, 0);
+
+// Gates can also be used in definite length envelopes, like the Perc envelope.
+// Just as we did above, we can instantiate a synth without generating any
+// sound by initializing the gate to 0. When the gate transitions to a positive
+// value, the sound plays. To play it again without releasing the synth, we can
+// set the gate back to zero and then to one again. An easier way to do this is
+// with a `TrigControl` argument. If you set a `TrigControl` argument to a
+// nonzero value, it holds that value for one control cycle, then snaps back to
+// zero. To specify an argument as a `TrigControl` argument, just prefix its
+// name with `t_`.
+
+(
+f = {
+  arg t_gate=0;
+  var sig, env;
+  env = EnvGen.kr(
+    Env.perc(0.01, 0.5),
+    t_gate
+  );
+  sig = SinOsc.ar(200);
+  sig = sig * 0.2;
+  sig = sig * env;
+  sig = sig!2;
+}
+)
+
+// Since t_gate is initialized to 0, this won't produce sound yet.
+
+x = f.play;
+
+// Every time we set t_gate to a positive value, the sound plays and the gate
+// resets, ready for another trigger.
+
+x.set(\t_gate, 1);
