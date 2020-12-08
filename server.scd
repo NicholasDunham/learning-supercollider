@@ -1,3 +1,10 @@
+/*****************************************************************************\
+|                                                                             |
+|                                    SERVER                                   |
+|                                                                             |
+\*****************************************************************************/
+
+
 // NOTE: I'm interacting with SuperCollider via the NeoVim plugin SCNvim on a
 // Mac. So before I do anything else, I open a SuperCollider document
 // (extension `.sc` or `.scd`) in NeoVim, then type `:SCNvimStart` to start

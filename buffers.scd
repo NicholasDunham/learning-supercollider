@@ -1,4 +1,8 @@
-// BUFFERS
+/*****************************************************************************\
+|                                                                             |
+|                                   BUFFERS                                   |
+|                                                                             |
+\*****************************************************************************/
 
 // The word buffer can refer to two separate but related things in
 // SuperCollider.
@@ -55,7 +59,10 @@ var audioPath = PathName.new(thisProcess.nowExecutingPath).parentPath ++ "audio/
 ~mySamp = audioPath ++ "file.aiff";
 )
 
-// UGENS
+
+/*****************************************************************************\
+|                                    UGENS                                    |
+\*****************************************************************************/
 
 // There are two UGens used for interacting with buffers: `PlayBuf` and
 // `BufRd`. Fundamentally, they do the same thing, but they have different
@@ -71,6 +78,7 @@ var audioPath = PathName.new(thisProcess.nowExecutingPath).parentPath ++ "audio/
 // normal, if desired. A quick way to scale correctly for sample rate
 // discrepancies is to use the `BufRateScale` UGen, which returns a ratio
 // between the buffer's original sample rate and the server's current rate.
+
 
 // PlayBuf
 
@@ -104,3 +112,38 @@ var audioPath = PathName.new(thisProcess.nowExecutingPath).parentPath ++ "audio/
 // Other useful arguments include `trigger` (often useful with `Dust` and
 // `Impulse`), `startPos`, and `loop`. Note that if `loop` is equal to 1, then
 // `doneAction` is ignored.
+
+
+// Synthdefs
+
+(
+SynthDef.new(\pb, {
+  arg buf=0, rate=1, t_trig=1, spos=0, loop=0, da=2, amp=0.5, out=0;
+  var sig;
+  sig = PlayBuf.ar(
+    2,            // Number of channels
+    buf,
+    BufRateScale.ir(buf) * rate,
+    t_trig,
+    startPos,
+    loop,
+    da
+  );
+  sig = sig * 0.3!2;
+  Out.ar(0, sig);
+}).add;
+)
+
+// Note that we made most of the useful values arguments, but we can't make the
+// number of channels an argument. This is because the number of channels must
+// be fixed at runtime. Technically we could pass this synth a mono file and it
+// would just put a warning in the post window and then play, but the best
+// thing to do would be to create separate synths for mono and stereo files.
+
+
+// BufRd
+
+// BufRd is another way to play the content of a buffer, but lets you read
+// directly from a buffer via a phase argument. This is more convenient for
+// taking custom control of how you read through a sample, for example using a
+// SinOsc to control playback speed.
