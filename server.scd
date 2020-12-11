@@ -64,3 +64,19 @@ s.quit;
 // Note that this closes some of the widgets we opened earlier, but not all.
 
 
+
+// BUSES
+
+// By default, we have two output buses and two input buses. (I've disabled the
+// input buses above.)
+
+s.options.numOutputBusChannels;         // 2
+s.options.numInputBusChannels;          // now 0; 2 by default
+s.options.numAudioBusChannels;          // now 1022; 1024 by default
+s.options.numPrivateAudioBusChannels;   // audio - input - output
+
+// By convention, the lowest two audio buses are connected to the hardware
+// output (the sound card, built-in audio, or audio interface, for example),
+// and the next two are connected to the audio input (such as a microphone).
+// This means that the first four buses (numbers 0 through 3) are "reserved,"
+// and those numbered 4 and up are available for use in a signal chain.
