@@ -1,14 +1,11 @@
-/*****************************************************************************\
-|                                                                             |
-|                                    SERVER                                   |
-|                                                                             |
-\*****************************************************************************/
-
+  ////////////////////////////////
+ //  The SuperCollider Server  //
+////////////////////////////////
 
 // NOTE: I'm interacting with SuperCollider via the NeoVim plugin SCNvim on a
 // Mac. So before I do anything else, I open a SuperCollider document
-// (extension `.sc` or `.scd`) in NeoVim, then type `:SCNvimStart` to start
-// the language interpreter.
+// (extension `.sc` or `.scd`) in NeoVim, then type `:SCNvimStart` to start the
+// language interpreter.
 
 // Once that's done, I can run a sequence like this to boot the audio server:
 
@@ -62,13 +59,14 @@ s.stopRecording;
 s.quit;
 
 // Note that this closes some of the widgets we opened earlier, but not all.
-
+// `:SCNVimStop` quites both the server and the interpreter, and shuts down all
+// widgets.
 
 
 // BUSES
 
 // By default, we have two output buses and two input buses. (I've disabled the
-// input buses above.)
+// input buses above, because I don't use them in SuperCollider currently.)
 
 s.options.numOutputBusChannels;         // 2
 s.options.numInputBusChannels;          // now 0; 2 by default

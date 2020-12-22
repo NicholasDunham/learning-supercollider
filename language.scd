@@ -1,10 +1,6 @@
-/******************************************************************************\
-|                                                                              |
-|                                  SCLANG                                      |
-|                                                                              |
-|                 Notes on SuperCollider's langugage features                  |
-|                                                                              |
-\******************************************************************************/
+    ///////////////////////////////////////////
+   // SCLANG: The language of SuperCollider //
+  ///////////////////////////////////////////
 
 // This is not intended to be a comprehensive guide to sclang. Rather, it's a
 // brief overview of what makes sclang unique---ways in which it differs from
@@ -40,9 +36,9 @@
 // block, within which are several subblocks.
 
 
-/******************************************************************************\
-|                                  VARIABLES                                   |
-\******************************************************************************/
+    ///////////////
+   // Variables //
+  ///////////////
 
 // Variables are not statically typed.
 
@@ -94,11 +90,11 @@ currentEnvironment.at(\myvar);
 // initialized at declaration.
 
 (
-var localvar = 4;
-localvar.postln;
+var localVar = 4;
+localVar.postln;
 )
 
-localvar.postln; // ERROR: Variable 'localvar' not defined.
+localVar.postln; // ERROR: Variable 'localvar' not defined.
 
 // Local variables only have scope within the code evaluation of which they are
 // part. This means that if you declare a local variable at the top level,
@@ -577,4 +573,29 @@ true and: true
 
   vib = SinOsc.ar(6).range(280, 320);
 
+  //////////////
+ // Equality //
+//////////////
 
+// SuperCollider has two equality operators. The double equals sign test for
+// eqality, and works on strings and arrays as you'd expect.
+
+a = "string";
+b = "string";
+a == b;         // true
+
+c = [ 1, 2, 3 ];
+d = [ 1, 2, 3 ];
+c == d;         // true
+
+// The triple equals sign tests for object identity.
+
+a === b;        // false
+c === d;        // false
+
+// This exposes an important difference between strings and symbols.
+
+e = \symbol;
+f = \symbol;
+e == f;         // true
+e === f;        // true
